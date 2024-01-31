@@ -1,0 +1,351 @@
+# -*- coding: iso-8859-1 -*-
+"""
+    Created on May 7 2020
+    
+    Description: This routine stacks a series of LSD profiles
+    
+    @author: Eder Martioli <martioli@iap.fr>
+    
+    Institut d'Astrophysique de Paris, France.
+    
+    Simple usage examples:
+    
+    python ~/spirou-tools/spirou-polarimetry/stack_lsd_profiles.py --input=*_lsd.fits -s
+
+    """
+
+__version__ = "1.0"
+
+__copyright__ = """
+    Copyright (c) ...  All rights reserved.
+    """
+
+from optparse import OptionParser
+import os,sys
+
+import numpy as np
+import glob
+
+import matplotlib.pyplot as plt
+import astropy.io.fits as fits
+
+from scipy.interpolate import interp1d
+from scipy import ndimage
+
+import spirouPolarUtils as spu
+
+
+def combine_profiles(vels, array, err, median=True, plot=False) :
+    
+    mean_pol = np.zeros_like(vels)
+    sigma_pol = np.zeros_like(vels)
+    
+    for i in range(len(vels)) :
+        if median :
+            mean_pol[i] = np.nanmedian(array[:,i])
+        else :
+            mean_pol[i] = np.nanmean(array[:,i])
+
+        sigma_pol[i] = np.sqrt(np.nansum(err[:,i] * err[:,i])) / float(len(err[:,i]))
+
+    if plot :
+        plt.errorbar(vels, mean_pol, yerr=sigma_pol, fmt='o')
+        plt.show()
+
+    return mean_pol, sigma_pol
+
+
+def plot_profiles(vels, array, err, median=True) :
+    
+    mean_pol = np.zeros_like(vels)
+    sigma_pol = np.zeros_like(vels)
+    
+    for i in range(len(vels)) :
+        if median :
+            mean_pol[i] = np.nanmedian(array[:,i])
+        else :
+            mean_pol[i] = np.nanmean(array[:,i])
+
+        sigma_pol[i] = np.sqrt(np.nansum(err[:,i] * err[:,i])) / float(len(err[:,i]))
+
+    meansigma = np.nanmean(sigma_pol)
+    shift = 0
+    for i in range(len(array)) :
+        color = [i/len(array),1-i/len(array),1-i/len(array)]
+        shift = 5 * meansigma * i
+        #plt.plot(vels, array[i] + shift, '-', color=color, lw=0.3, alpha=0.5)
+        plt.errorbar(vels, array[i], yerr=err[i], fmt='.', color=color, alpha=0.5)
+    
+    shift += 5 * meansigma
+    plt.plot(vels, mean_pol, 'k-', lw=2)
+    #plt.errorbar(vels, mean_pol + shift, yerr=sigma_pol, fmt='o')
+    plt.xlabel("Velocity [km/s]")
+    plt.ylabel("degree of polarization")
+    plt.show()
+
+    return mean_pol, sigma_pol
+
+
+parser = OptionParser()
+parser.add_option("-i", "--input", dest="input", help="Input LSD data pattern",type='string',default="*_lsd.fits")
+parser.add_option("-o", "--output", dest="output", help="Output stack LSD FITS file",type='string',default="")
+parser.add_option("-r", "--source_rv", dest="source_rv", help="Source radial velocity in km/s",type='float',default=0.)
+parser.add_option("-1", "--min_vel", dest="min_vel", help="Minimum velocity [km/s]",type='float',default=-60.)
+parser.add_option("-2", "--max_vel", dest="max_vel", help="Maximum velocity [km/s]",type='float',default=60.)
+parser.add_option("-e", action="store_true", dest="use_residuals", help="use residual Stokes VQU profiles", default=False)
+parser.add_option("-s", action="store_true", dest="star_frame", help="LSD profiles in the star frame", default=False)
+parser.add_option("-m", action="store_true", dest="mediancombine", help="mediancombine", default=False)
+parser.add_option("-t", action="store_true", dest="timecombine", help="timecombine", default=False)
+parser.add_option("-p", action="store_true", dest="plot", help="plot", default=False)
+parser.add_option("-v", action="store_true", dest="verbose", help="verbose", default=False)
+
+try:
+    options,args = parser.parse_args(sys.argv[1:])
+except:
+    print("Error: check usage with stack_lsd_profiles.py -h ")
+    sys.exit(1)
+
+if options.verbose:
+    print('Input LSD data pattern: ', options.input)
+    print('Output stack LSD FITS file: ', options.output)
+    print('Source radial velocity in km/s: ', options.source_rv)
+    print('Minimum velocity = {0:.2f} km/s: '.format(options.min_vel))
+    print('Maximum velocity = {0:.2f} km/s: '.format(options.max_vel))
+
+# make list of data files
+if options.verbose:
+    print("Creating list of lsd files...")
+inputdata = sorted(glob.glob(options.input))
+#---
+
+bjd = []
+lsd_vels = []
+lsd_pol, lsd_null, lsd_flux  = [], [], []
+lsd_pol_err, lsd_null_err, lsd_flux_err  = [], [], []
+lsd_pol_corr, lsd_pol_model_corr  = [], []
+lsd_flux_corr  = []
+
+source_rvs = []
+
+pol_rv, zeeman_split = [], []
+pol_line_depth, pol_fwhm = [], []
+vel_min, vel_max = options.min_vel, options.max_vel
+
+for i in range(len(inputdata)) :
+    print("Loading LSD profile in file {0}/{1}: {2}".format(i, len(inputdata), inputdata[i]))
+    hdu = fits.open(inputdata[i])
+    hdr = hdu[0].header + hdu[1].header
+
+    try :
+        #stokesI_fit = spu.fit_lsd_flux_profile(hdu['VELOCITY'].data, hdu['STOKESI'].data, hdu['STOKESI_ERR'].data, guess=None, func_type="voigt", plot=False)
+        stokesI_fit = spu.fit_lsd_flux_profile(hdu['VELOCITY'].data, hdu['STOKESI'].data, hdu['STOKESI_ERR'].data, guess=None, func_type="gaussian", plot=False)
+    except :
+        print("WARNING: Could not fit gaussian to Stokes I profile, skipping file {0}: {2}".format(i, inputdata[i]))
+        continue
+    
+    if "MEANBJD" in hdr.keys() :
+        bjd.append(float(hdr["MEANBJD"]))
+    elif "BJD" in hdr.keys() :
+        bjd.append(float(hdr["BJD"]))
+    else :
+        print("Could not read BJD from header, exit ...")
+        exit()
+
+    if options.source_rv == 0. :
+        source_rv = stokesI_fit["VSHIFT"]
+    else  :
+        source_rv = options.source_rv
+
+    source_rvs.append(source_rv)
+
+    if i == 0 :
+        vels_sup_lim = np.nanmax(hdu['VELOCITY'].data)
+        vels_inf_lim = np.nanmin(hdu['VELOCITY'].data)
+
+        if (source_rv + vel_min) < vels_inf_lim :
+            print("WARNING: requested RVs outside range, reseting vel_min to {:.1f} km/s".format(vels_inf_lim - source_rv))
+            vel_min = vels_inf_lim - source_rv
+
+        if (source_rv + vel_max) > vels_sup_lim :
+            print("WARNING: requested RVs outside range, reseting vel_max to {:.1f} km/s".format(vels_sup_lim - source_rv))
+            vel_max = vels_sup_lim - source_rv
+
+        base_header = hdr
+        vels = hdu['VELOCITY'].data
+        
+        if options.star_frame :
+            mask = vels > vel_min
+            mask &= vels < vel_max
+        else :
+            mask = vels > source_rv + vel_min
+            mask &= vels < source_rv + vel_max
+
+    lsd_vels.append(hdu['VELOCITY'].data)
+    lsd_pol.append(hdu['STOKESVQU'].data)
+    lsd_null.append(hdu['NULL'].data)
+    lsd_flux.append(hdu['STOKESI'].data)
+
+    lsd_pol_err.append(hdu['STOKESVQU_ERR'].data)
+    lsd_null_err.append(hdu['NULL_ERR'].data)
+    lsd_flux_err.append(hdu['STOKESI_ERR'].data)
+
+    pol_rv.append(source_rv)
+    
+    if options.star_frame :
+        interp_pol_corr = interp1d(hdu['VELOCITY'].data-source_rv, hdu['STOKESVQU'].data, kind='cubic')
+        interp_flux_corr = interp1d(hdu['VELOCITY'].data-source_rv, hdu['STOKESI'].data, kind='cubic')
+    else :
+        interp_pol_corr = interp1d(hdu['VELOCITY'].data, hdu['STOKESVQU'].data, kind='cubic')
+        interp_flux_corr = interp1d(hdu['VELOCITY'].data, hdu['STOKESI'].data, kind='cubic')
+
+    lsd_flux_corr.append(interp_flux_corr(vels[mask]))
+    lsd_pol_corr.append(interp_pol_corr(vels[mask]))
+
+    hdu.close()
+
+bjd = np.array(bjd)
+lsd_vels = np.array(lsd_vels, dtype=float)
+
+lsd_pol = np.array(lsd_pol, dtype=float)
+lsd_pol_err = np.array(lsd_pol_err, dtype=float)
+lsd_pol_corr = np.array(lsd_pol_corr, dtype=float)
+
+lsd_flux = np.array(lsd_flux, dtype=float)
+lsd_flux_err = np.array(lsd_flux_err, dtype=float)
+lsd_flux_corr = np.array(lsd_flux_corr, dtype=float)
+
+lsd_null = np.array(lsd_null, dtype=float)
+lsd_null_err = np.array(lsd_null_err, dtype=float)
+
+pol_rv = np.array(pol_rv)
+source_rvs = np.array(source_rvs)
+
+"""
+plt.plot(bjd, pol_rv, '-', label="Polarimetry RV")
+plt.ylabel("radial velocity [km/s]")
+plt.xlabel("BJD")
+plt.legend()
+plt.show()
+"""
+
+ind_ini, ind_end = 0, 0
+
+source_rv = np.nanmedian(source_rvs)
+
+lsd_pol = lsd_pol[:,mask]
+lsd_pol_err = lsd_pol_err[:,mask]
+
+median_flux = np.median(lsd_flux[:,mask])
+lsd_flux = lsd_flux[:,mask] / median_flux
+lsd_flux_err = lsd_flux_err[:,mask] / median_flux
+
+lsd_null = lsd_null[:,mask] - np.median(lsd_null[:,mask])
+lsd_null_err = lsd_null_err[:,mask]
+
+# set 2D plot parameters
+if options.plot :
+    x_lab = r"$Velocity$ [km/s]"     #Wavelength axis
+    #y_lab = r"Time [BJD]"         #Time axis
+    y_lab = r"Exposure number"         #Time axis
+    z_lab_pol = r"Degree of polarization (Stokes V)"     #Intensity (exposures)
+    z_lab_null = r"Null polarization"     #Intensity (exposures)
+    z_lab_flux = r"Intensity (Stokes I)"     #Intensity (exposures)
+    coolwarm_color_map = plt.cm.get_cmap('coolwarm')
+    color_map = plt.cm.get_cmap('seismic')
+    reversed_color_map = color_map.reversed()
+    LAB_pol  = [x_lab,y_lab,z_lab_pol]
+    LAB_null  = [x_lab,y_lab,z_lab_null]
+    LAB_flux  = [x_lab,y_lab,z_lab_flux]
+
+# Stokes I (flux) LSD profiles:
+reduced_lsd_flux = spu.subtract_median(lsd_flux_corr, vels=vels[mask], ind_ini=ind_ini, ind_end=ind_end, fit=True, verbose=False, median=True, subtract=False)
+reduced_lsd_flux = spu.subtract_median(reduced_lsd_flux['ccf'], vels=vels[mask], ind_ini=ind_ini, ind_end=ind_end, fit=True, verbose=False, median=True, subtract=False)
+reduced_lsd_flux = spu.subtract_median(reduced_lsd_flux['ccf'], vels=vels[mask], ind_ini=ind_ini, ind_end=ind_end, fit=True, verbose=False, median=True, subtract=False)
+
+if options.plot :
+    spu.plot_2d(reduced_lsd_flux['vels'], bjd, reduced_lsd_flux['ccf'], LAB=LAB_flux, use_index_in_y=True, title="LSD Stokes I profiles", cmap=coolwarm_color_map)
+#--------------------------
+
+# Polarimetry LSD Stokes V profiles -- RV corrected using the RV obtained from voigt model to the zeeman split:
+#reduced_lsd_pol_corr = spu.subtract_median(lsd_pol_corr, vels=vels, ind_ini=ind_ini, ind_end=ind_end, fit=True, verbose=False, median=False, subtract=True)
+reduced_lsd_pol_corr = spu.subtract_median(lsd_pol_corr, vels=vels[mask], ind_ini=ind_ini, ind_end=ind_end, fit=True, verbose=False, median=True, subtract=True)
+reduced_lsd_pol_corr = spu.subtract_median(reduced_lsd_pol_corr['ccf'], vels=vels[mask], ind_ini=ind_ini, ind_end=ind_end, fit=True, verbose=False, median=True, subtract=True)
+if options.use_residuals :
+    reduced_lsd_pol_corr = spu.subtract_median(reduced_lsd_pol_corr['residuals'], vels=vels[mask], ind_ini=ind_ini, ind_end=ind_end, fit=True, verbose=False, median=True, subtract=True)
+else :
+    reduced_lsd_pol_corr = spu.subtract_median(reduced_lsd_pol_corr['ccf'], vels=vels[mask], ind_ini=ind_ini, ind_end=ind_end, fit=True, verbose=False, median=True, subtract=True)
+
+if options.plot :
+    spu.plot_2d(reduced_lsd_pol_corr['vels'], bjd, reduced_lsd_pol_corr['ccf'], LAB=LAB_pol, use_index_in_y=True, title="LSD Stokes V profiles", cmap=coolwarm_color_map)
+    
+
+#lsd_pol_corr_res = ndimage.median_filter(reduced_lsd_pol_corr['ccf_sub'], size=3)
+#if options.plot :
+#    spu.plot_2d(reduced_lsd_pol_corr['vels'], bjd, lsd_pol_corr_res, LAB=LAB_pol, title="Median-subtracted airmass detrended smoothed LSD Stokes V profiles", cmap=reversed_color_map)
+#--------------------------
+
+# Polarimetry LSD Null profiles:
+reduced_lsd_null = spu.subtract_median(lsd_null, vels=vels[mask], ind_ini=ind_ini, ind_end=ind_end, fit=True, verbose=False, median=False, subtract=True)
+if options.plot :
+    #spu.plot_2d(reduced_lsd_null['vels'], bjd, reduced_lsd_null['ccf'], LAB=LAB_null, use_index_in_y=True, z_lim=[-0.002,0.0025], title="LSD null profiles", cmap=coolwarm_color_map)
+    spu.plot_2d(reduced_lsd_null['vels'], bjd, reduced_lsd_null['ccf'], LAB=LAB_null, use_index_in_y=True, title="LSD null profiles", cmap=coolwarm_color_map)
+#--------------------------
+
+#----- plot mean profiles
+if options.timecombine :
+    # Use median profile and errors from time average
+    z_p, z_p_err = reduced_lsd_pol_corr["ccf_med"], reduced_lsd_pol_corr["ccf_sig"]
+    z_np, z_np_err = reduced_lsd_null["ccf_med"], reduced_lsd_null["ccf_sig"]
+else :
+    # Calculate median profiles and propagate statistical errors
+    z_p, z_p_err = combine_profiles(reduced_lsd_pol_corr['vels'], reduced_lsd_pol_corr['ccf'], lsd_pol_err, median=options.mediancombine)
+    z_np, z_np_err = combine_profiles(reduced_lsd_null['vels'], reduced_lsd_null['ccf'], lsd_null_err, median=options.mediancombine)
+
+# plot profiles in linear scale
+if options.plot :
+    plot_profiles(reduced_lsd_pol_corr['vels'], reduced_lsd_pol_corr['ccf'], lsd_pol_err, median=options.mediancombine)
+
+# Fit model to mean LSD polarization profile:
+zeeman = spu.fit_zeeman_split(reduced_lsd_pol_corr['vels'], reduced_lsd_pol_corr["ccf_med"], pol_err=reduced_lsd_pol_corr["ccf_sig"], func_type="gaussian", plot=False)
+
+amplitude, cont = zeeman["AMP"], zeeman["CONT"]
+vel1, vel2, sigma = zeeman["V1"], zeeman["V2"], zeeman["SIG"]
+guess = [amplitude, vel1, vel2, sigma, sigma, cont]
+
+try :
+    zeeman_voigt = spu.fit_zeeman_split(reduced_lsd_pol_corr['vels'], reduced_lsd_pol_corr["ccf_med"], reduced_lsd_pol_corr["ccf_sig"], guess=guess, func_type="voigt", plot=False)
+except :
+    zeeman_voigt = zeeman
+    print("WARNING: could not fit Voigt to polar LSD profile, adopting Gaussian model")
+#----------------------------------------------
+
+if options.timecombine :
+    # Use median profile and errors from time average
+    zz, zz_err = reduced_lsd_flux["ccf_med"], reduced_lsd_flux["ccf_sig"]
+else :
+    # Calculate median flux profile and propagate statistical errors
+    zz, zz_err = combine_profiles(reduced_lsd_flux['vels'], reduced_lsd_flux['ccf'], lsd_flux_err, median=options.mediancombine)
+
+#----------------------------------------------
+# fit gaussian or voigt function to the measured flux LSD profile
+flux_model = spu.fit_lsd_flux_profile(reduced_lsd_flux['vels'], zz, zz_err, guess=None, func_type="gaussian", plot=False)
+
+try :
+    amplitude, cont = flux_model["AMP"], flux_model["CONT"]
+    vel_shift, sigma = flux_model["VSHIFT"], flux_model["SIG"]
+    guess = [amplitude, vel_shift, sigma, sigma, cont]
+
+    lsd_flux_model = spu.fit_lsd_flux_profile(vels[mask], zz, zz_err, guess=None, func_type="voigt", plot=False)
+except :
+    lsd_flux_model = flux_model
+    print("WARNING: could not fit Voigt to Stokes I LSD profile, adopting Gaussian model")
+
+# plot all profiles and models together
+spu.plot_lsd_profiles(vels[mask], zz, zz_err, lsd_flux_model["MODEL"], z_p, z_p_err, zeeman_voigt["MODEL"], z_np, z_np_err)
+#--------------------------
+
+# save stack LSD profiles to fits file
+if options.output != "" :
+    spu.save_lsdstack_to_fits(options.output, vels[mask], zz, zz_err, lsd_flux_model, z_p, z_p_err, zeeman_voigt, z_np, z_np_err, base_header=base_header, blong_vel_min=source_rv+vel_min, blong_vel_max=source_rv+vel_max)
+#--------------------------
+

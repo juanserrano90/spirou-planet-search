@@ -1,0 +1,14 @@
+FILE                                            	BJD               	QCC_ALL	DPRTYPE   	PI_NAME             	
+science/TOI1696/2814660o_pp_e2dsff_tcorr_AB.fits	2459916.0389938764	T      	POLAR_DARK	Jean-Francois Donati	
+science/TOI1696/2814661o_pp_e2dsff_tcorr_AB.fits	2459916.0497654937	T      	POLAR_DARK	Jean-Francois Donati	
+science/TOI1696/2814662o_pp_e2dsff_tcorr_AB.fits	2459916.0604740097	T      	POLAR_DARK	Jean-Francois Donati	
+science/TOI1696/2814663o_pp_e2dsff_tcorr_AB.fits	2459916.0712465257	T      	POLAR_DARK	Jean-Francois Donati	
+science/TOI1696/2846052o_pp_e2dsff_tcorr_AB.fits	2459978.8544239784	T      	POLAR_DARK	Jean-Francois Donati	
+science/TOI1696/2846053o_pp_e2dsff_tcorr_AB.fits	2459978.8651953214	T      	POLAR_DARK	Jean-Francois Donati	
+science/TOI1696/2846054o_pp_e2dsff_tcorr_AB.fits	2459978.8759673634	T      	POLAR_DARK	Jean-Francois Donati	
+science/TOI1696/2846055o_pp_e2dsff_tcorr_AB.fits	2459978.88667401  	T      	POLAR_DARK	Jean-Francois Donati	
+science/TOI1696/2846409o_pp_e2dsff_tcorr_AB.fits	2459981.834022003 	T      	POLAR_DARK	Jean-Francois Donati	
+science/TOI1696/2846410o_pp_e2dsff_tcorr_AB.fits	2459981.844794624 	F      	POLAR_DARK	Jean-Francois Donati	
+science/TOI1696/2846411o_pp_e2dsff_tcorr_AB.fits	2459981.855565345 	F      	POLAR_DARK	Jean-Francois Donati	
+science/TOI1696/2846412o_pp_e2dsff_tcorr_AB.fits	2459981.8663370647	F      	POLAR_DARK	Jean-Francois Donati	
+science/TOI1696/2846732o_pp_e2dsff_tcorr_AB.fits	2459984.854831811 	F      	POLAR_DARK	Jean-Francois Donati	

@@ -1,0 +1,94 @@
+Already published form SPIRou Team:
+TOI-1278.01     Artigau et al. (2021)                                                            12 epochs
+TOI-1759.01     Martioli et al. (2022)                                                           54
+TOI-1452.01     Cadieux et al. (2022)                                                            53
+TOI-1695.01     Kiefer et al. (2022)                                                             45
+---
+AU Mic          Donati et al. (2023)                    active                                  268 
+TOI-4860.01     Almenara et al. (submitted)                                                      21
+TOI-3568.01     Martioli et al. (in prep)                                                         6
+Trappist-1      L'Heureux et al (in prep)                                                        52
+
+
+Published by other teams:
+TOI-732.01      Nowak et al. (2020): CARMENES+ IRD+iSHELL, Cloutier et al. (2020): HARPS-N       17
+TOI-442.01      Dreizler et al. (2020): CARMENES+ESPRESSO+HIRES+PFS+iSHELL                       17
+---
+TOI-233.01      HARPS paper in prep        active                                                 7
+
+
+Actives (work to be done) :
+K2-33b                                                                                           30
+TOI-876.01                                                                                       15
+--
+K2-147b                                                                                           3
+
+Work to be done with current data :
+ TOI-727.01     from Martioli, Kiefer, Cadieux, Arnold, Hébrard…                                 35
+TOI-1732.01             nothing                                                                  16
+TOI-4438.01             K = 3.0 +-1.5 ?                                                          51
+TOI-4479.01             nothing                                                                  26
+TOI-4616.01             something around 25 M_J et 38d ?                                         27
+TOI-2120.01             K = 9 +-3 ?    (Montréal: 6.0 +/- 1.5)                                   47
+TOI-1696.01                                                                                       3
+
+
+
++++++++++++++++++
+
+Reduction from Charles Cadieux in Montreal:
+http://apero.exoplanets.ca/ari/spirou/spirou_V0.7.282_full/rst/object_table.html
+User : spirou
+pass: fantasio
+
+
++++++++++++++++++
+
+Reduction from Andres Carmona in Grenoble/Marseille:
+
+LBL2: https://filesender.renater.fr/?s=download&token=73dbf73f-24ed-4d18-bd78-d16c09c9a340
+LBL: https://filesender.renater.fr/?s=download&token=dbad34f5-52b4-4ace-b231-be5256c2e4ed
+
+The rdb file filtered by the data at |Vtot|<10km/s is there, the extension is _bervzp_Vtot10corr.rdb
+
+
+The file QC_tcorr_<star>.txt has the value of the quality control flag QCC_ALL=“T” if all ok, or QCC_ALL=“F” for the tcorr files used in LBL.
+if there is a problem in the tcorr QCC_ALL=F
+
+These are the star and dates with problems:
+QC_tcorr_AUMIC.txt:science/AUMIC/2540229o_pp_e2dsff_tcorr_AB.fits       2459156.819248869       F     
+QC_tcorr_AUMIC.txt:science/AUMIC/2877296o_pp_e2dsff_tcorr_AB.fits       2460105.1069875946      F     
+QC_tcorr_K2_147.txt:science/K2_147/2426780o_pp_e2dsff_tcorr_AB.fits     2458656.0221228465      F     
+QC_tcorr_TOI1695.txt:science/TOI1695/2692709o_pp_e2dsff_tcorr_AB.fits   2459563.807344736       F     
+QC_tcorr_TOI1696.txt:science/TOI1696/2846410o_pp_e2dsff_tcorr_AB.fits   2459981.844794624       F     
+QC_tcorr_TOI1696.txt:science/TOI1696/2846411o_pp_e2dsff_tcorr_AB.fits   2459981.855565345       F     
+QC_tcorr_TOI1696.txt:science/TOI1696/2846412o_pp_e2dsff_tcorr_AB.fits   2459981.8663370647      F     
+QC_tcorr_TOI1696.txt:science/TOI1696/2846732o_pp_e2dsff_tcorr_AB.fits   2459984.854831811       F     
+QC_tcorr_TOI1759.txt:science/TOI1759/2512412o_pp_e2dsff_tcorr_AB.fits   2459096.003412394       F     
+QC_tcorr_TOI2120.txt:science/TOI2120/2811829o_pp_e2dsff_tcorr_AB.fits   2459894.8993147337      F     
+QC_tcorr_TOI4479.txt:science/TOI4479/2810748o_pp_e2dsff_tcorr_AB.fits   2459886.7145031528      F     
+QC_tcorr_TOI4479.txt:science/TOI4479/2810749o_pp_e2dsff_tcorr_AB.fits   2459886.7252733503      F     
+QC_tcorr_TOI4479.txt:science/TOI4479/2811120o_pp_e2dsff_tcorr_AB.fits   2459890.7205178854      F     
+QC_tcorr_TOI4479.txt:science/TOI4479/2812301o_pp_e2dsff_tcorr_AB.fits   2459897.717167811       F     
+QC_tcorr_TOI4479.txt:science/TOI4479/2876050o_pp_e2dsff_tcorr_AB.fits   2460099.0464464687      F     
+QC_tcorr_TOI4479.txt:science/TOI4479/2876051o_pp_e2dsff_tcorr_AB.fits   2460099.057219666       F     
+QC_tcorr_TOI4479.txt:science/TOI4479/2876052o_pp_e2dsff_tcorr_AB.fits   2460099.0679295575      F     
+QC_tcorr_TOI4860.txt:science/TOI4860/2731617o_pp_e2dsff_tcorr_AB.fits   2459651.0146324523      F     
+QC_tcorr_TOI4860.txt:science/TOI4860/2731618o_pp_e2dsff_tcorr_AB.fits   2459651.017018223       F     
+QC_tcorr_TOI4860.txt:science/TOI4860/2731619o_pp_e2dsff_tcorr_AB.fits   2459651.019405494       F     
+QC_tcorr_TOI4860.txt:science/TOI4860/2731620o_pp_e2dsff_tcorr_AB.fits   2459651.0217916644      F     
+QC_tcorr_TOI4860.txt:science/TOI4860/2871231o_pp_e2dsff_tcorr_AB.fits   2460064.8963669003      F     
+QC_tcorr_TOI4860.txt:science/TOI4860/2871232o_pp_e2dsff_tcorr_AB.fits   2460064.9035910456      F     
+QC_tcorr_TOI4860.txt:science/TOI4860/2875791o_pp_e2dsff_tcorr_AB.fits   2460096.806090045       F     
+QC_tcorr_TOI736.txt:science/TOI736/2470177o_pp_e2dsff_tcorr_AB.fits     2458899.096099444       F     
+QC_tcorr_TRAPPIST1.txt:science/TRAPPIST1/2454145o_pp_e2dsff_tcorr_AB.fits       2458787.7880224814      F     
+QC_tcorr_TRAPPIST1.txt:science/TRAPPIST1/2454146o_pp_e2dsff_tcorr_AB.fits       2458787.796154636       F     
+QC_tcorr_TRAPPIST1.txt:science/TRAPPIST1/2454147o_pp_e2dsff_tcorr_AB.fits       2458787.80428109        F     
+QC_tcorr_TRAPPIST1.txt:science/TRAPPIST1/2454367o_pp_e2dsff_tcorr_AB.fits       2458788.7672133422      F     
+QC_tcorr_TRAPPIST1.txt:science/TRAPPIST1/2623595o_pp_e2dsff_tcorr_AB.fits       2459413.9830700913      F
+
+
+Inoticed that many of the WP2 objects have no FP observations, so the bervzp files have nans.
+I attach the raw lbl2 files (no zeropoint correction). There you can find the RVs where the drift is NaN.
+https://filesender.renater.fr/?s=download&token=d87a075d-0efe-4344-bbf4-5b9c3a0a3d83
+A column with the DPRTYPE is included now in the Quality control file for each object.

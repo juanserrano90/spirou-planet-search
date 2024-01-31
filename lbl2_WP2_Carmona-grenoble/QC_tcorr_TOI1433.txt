@@ -1,0 +1,9 @@
+FILE                                            	BJD               	QCC_ALL	DPRTYPE 	PI_NAME             	
+science/TOI1433/2515874o_pp_e2dsff_tcorr_AB.fits	2459113.7903427985	T      	POLAR_FP	Jean-Francois Donati	
+science/TOI1433/2515875o_pp_e2dsff_tcorr_AB.fits	2459113.7927284124	T      	POLAR_FP	Jean-Francois Donati	
+science/TOI1433/2515876o_pp_e2dsff_tcorr_AB.fits	2459113.795115526 	T      	POLAR_FP	Jean-Francois Donati	
+science/TOI1433/2515877o_pp_e2dsff_tcorr_AB.fits	2459113.7975014397	T      	POLAR_FP	Jean-Francois Donati	
+science/TOI1433/2517000o_pp_e2dsff_tcorr_AB.fits	2459119.8043409097	T      	POLAR_FP	Jean-Francois Donati	
+science/TOI1433/2517001o_pp_e2dsff_tcorr_AB.fits	2459119.8067273116	T      	POLAR_FP	Jean-Francois Donati	
+science/TOI1433/2517002o_pp_e2dsff_tcorr_AB.fits	2459119.8091138136	T      	POLAR_FP	Jean-Francois Donati	
+science/TOI1433/2517003o_pp_e2dsff_tcorr_AB.fits	2459119.8115007156	T      	POLAR_FP	Jean-Francois Donati	

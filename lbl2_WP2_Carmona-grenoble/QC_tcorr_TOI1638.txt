@@ -1,0 +1,20 @@
+FILE                                            	BJD               	QCC_ALL	DPRTYPE 	PI_NAME             	
+science/TOI1638/2515947o_pp_e2dsff_tcorr_AB.fits	2459113.9515550453	T      	POLAR_FP	Jean-Francois Donati	
+science/TOI1638/2515948o_pp_e2dsff_tcorr_AB.fits	2459113.9539416567	T      	POLAR_FP	Jean-Francois Donati	
+science/TOI1638/2515949o_pp_e2dsff_tcorr_AB.fits	2459113.9563289676	T      	POLAR_FP	Jean-Francois Donati	
+science/TOI1638/2515950o_pp_e2dsff_tcorr_AB.fits	2459113.9587150784	T      	POLAR_FP	Jean-Francois Donati	
+science/TOI1638/2515951o_pp_e2dsff_tcorr_AB.fits	2459113.9618119225	T      	POLAR_FP	Jean-Francois Donati	
+science/TOI1638/2515953o_pp_e2dsff_tcorr_AB.fits	2459113.966585644 	T      	POLAR_FP	Jean-Francois Donati	
+science/TOI1638/2515954o_pp_e2dsff_tcorr_AB.fits	2459113.968973355 	T      	POLAR_FP	Jean-Francois Donati	
+science/TOI1638/2516162o_pp_e2dsff_tcorr_AB.fits	2459114.961896368 	T      	POLAR_FP	Jean-Francois Donati	
+science/TOI1638/2516163o_pp_e2dsff_tcorr_AB.fits	2459114.9642836764	T      	POLAR_FP	Jean-Francois Donati	
+science/TOI1638/2516164o_pp_e2dsff_tcorr_AB.fits	2459114.966670285 	T      	POLAR_FP	Jean-Francois Donati	
+science/TOI1638/2516165o_pp_e2dsff_tcorr_AB.fits	2459114.969057194 	T      	POLAR_FP	Jean-Francois Donati	
+science/TOI1638/2517063o_pp_e2dsff_tcorr_AB.fits	2459119.991722386 	T      	POLAR_FP	Jean-Francois Donati	
+science/TOI1638/2517064o_pp_e2dsff_tcorr_AB.fits	2459119.994108782 	T      	POLAR_FP	Jean-Francois Donati	
+science/TOI1638/2517065o_pp_e2dsff_tcorr_AB.fits	2459119.996496079 	T      	POLAR_FP	Jean-Francois Donati	
+science/TOI1638/2517066o_pp_e2dsff_tcorr_AB.fits	2459119.9988827757	T      	POLAR_FP	Jean-Francois Donati	
+science/TOI1638/2517259o_pp_e2dsff_tcorr_AB.fits	2459120.9334204574	T      	POLAR_FP	Jean-Francois Donati	
+science/TOI1638/2517260o_pp_e2dsff_tcorr_AB.fits	2459120.9358079527	T      	POLAR_FP	Jean-Francois Donati	
+science/TOI1638/2517261o_pp_e2dsff_tcorr_AB.fits	2459120.938193848 	T      	POLAR_FP	Jean-Francois Donati	
+science/TOI1638/2517262o_pp_e2dsff_tcorr_AB.fits	2459120.940580243 	T      	POLAR_FP	Jean-Francois Donati	
